@@ -82,58 +82,27 @@ var corr = gd.getNextNumber();
 // Temp mute:
 // imp.createNewRoi();
 // imp.getROI();
+
 //var path = IJ.getDirectory("Select a folder to save PIV results");
 path = ["/Users/brian/working/"]
-//IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
 
 
 var stackSize = imp.getImageStackSize();
 IJ.log("Slices: " + stackSize);
 
-
+changes = false;
 //setBatchMode(true);
-for(s=0;s<stackSize;s++){
-	ss = s + 2;
+for(s=1;s<stackSize;s++){
+	var ss = s + 1;
 	// Incorporate ROI selection in next step
 	IJ.run("Duplicate...", "title=[seq_"+s+"] duplicate range="+s+"-"+ss+"");
 	IJ.log("s = " + s);
 	IJ.log("s+1 = " + ss);
     IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
-	//IJ.selectWindow(i0);
-	//WindowManager.setCurrentWindow(i0);
-	//flushWindows();
-}
-
-
-
-function flushWindows() {
-	var imageCount = WindowManager.getImageCount();
-	IJ.log(imageCount);
-    for(s=1;s<imageCount+1;s++){
-	
-    	if(WindowManager.getCurrentWindow()!=i0){
-	    	IJ.run("Close");
-	    	//IJ.log("Closing time!!!");
-	    }
-
-	    else{
-	    WindowManager.putBehind();
-	    }
+    while(imp2 = WindowManager.getImage(WindowManager.getNthImageID(2))) {
+    	// Put save command here...
+    	//imp2.save();
+        imp2.close();
     }
-    return;
 }
-
-// setBatchMode(true);
-// for(s=1;s<slices;s++){
-// 	IJ.run("Duplicate...", "title=[seq_"+s+"] duplicate range="+s+"_"+s+1+"");
-// 	IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch save=["+path+"]");
-// 	for(n=1;n<nImages;n++){
-// 		selectImage(n);
-// 		if(n!=id0)close();
-// 	}
-// }
-
-
-
-
 
