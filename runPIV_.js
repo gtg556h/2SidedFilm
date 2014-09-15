@@ -39,16 +39,11 @@ importClass(Packages.ij.gui.GenericDialog);
 // Only the first 5 columns are used for vector plot. 
 
 imp = IJ.getImage();
-var i0 = imp.getID();
+//var i0 = imp.getID();
+i0 = WindowManager.getCurrentWindow();
 IJ.log(i0);
-IJ.selectWindow(i0);
 
 
-// imp.show();
-// id0 = imp.getImageID();
-//i = imp.nSlices();
-
-//imp.duplicate();
  
 IJ.run("StackReg", "transformation=[Rigid Body]");
 
@@ -72,24 +67,23 @@ gd.showDialog();
 //    return;
 //}
 
-//int ns = imp.nSlices;
-
-piv1 = gd.getNextNumber();
-sw1 = gd.getNextNumber();
-vs1 = gd.getNextNumber();
-piv2 = gd.getNextNumber();
-sw2 = gd.getNextNumber();
-vs2 = gd.getNextNumber();
-piv3 = gd.getNextNumber();
-sw3 = gd.getNextNumber();
-vs3 = gd.getNextNumber();
-corr = gd.getNextNumber();
+var piv1 = gd.getNextNumber();
+var sw1 = gd.getNextNumber();
+var vs1 = gd.getNextNumber();
+var piv2 = gd.getNextNumber();
+var sw2 = gd.getNextNumber();
+var vs2 = gd.getNextNumber();
+var piv3 = gd.getNextNumber();
+var sw3 = gd.getNextNumber();
+var vs3 = gd.getNextNumber();
+var corr = gd.getNextNumber();
 
 
 // Temp mute:
 // imp.createNewRoi();
 // imp.getROI();
 //var path = IJ.getDirectory("Select a folder to save PIV results");
+path = ["/Users/brian/working/"]
 //IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
 
 
@@ -98,22 +92,36 @@ IJ.log("Slices: " + stackSize);
 
 
 //setBatchMode(true);
-for(s=1;s<stackSize;s++){
-	IJ.run("Duplicate...", "title=[seq_"+s+"] duplicate range="+s+"-"+s+1+"");
-
-	//IJ.selectWindow(title... or id);
+for(s=0;s<stackSize;s++){
+	ss = s + 2;
+	// Incorporate ROI selection in next step
+	IJ.run("Duplicate...", "title=[seq_"+s+"] duplicate range="+s+"-"+ss+"");
+	IJ.log("s = " + s);
+	IJ.log("s+1 = " + ss);
+    IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
+	//IJ.selectWindow(i0);
+	//WindowManager.setCurrentWindow(i0);
+	//flushWindows();
 }
 
-var idList = WindowManager.getIDList();
-IJ.log(idList);
-var imageCount = WindowManager.getImageCount();
-IJ.log(imageCount);
-for(s=1;s<imageCount+1;s++){
-	WindowManager.putBehind();
+
+
+function flushWindows() {
+	var imageCount = WindowManager.getImageCount();
+	IJ.log(imageCount);
+    for(s=1;s<imageCount+1;s++){
 	
-	WindowManager.removeWindow();(WindowManager.getNthImageID(s));
-}
+    	if(WindowManager.getCurrentWindow()!=i0){
+	    	IJ.run("Close");
+	    	//IJ.log("Closing time!!!");
+	    }
 
+	    else{
+	    WindowManager.putBehind();
+	    }
+    }
+    return;
+}
 
 // setBatchMode(true);
 // for(s=1;s<slices;s++){
