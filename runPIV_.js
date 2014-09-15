@@ -1,4 +1,5 @@
 importClass(Packages.ij.IJ);
+importClass(Packages.ij.WindowManager);
 importClass(Packages.ij.plugin.frame.RoiManager);
 importClass(Packages.ij.gui.GenericDialog);
 
@@ -38,7 +39,9 @@ importClass(Packages.ij.gui.GenericDialog);
 // Only the first 5 columns are used for vector plot. 
 
 imp = IJ.getImage();
-
+var i0 = imp.getID();
+IJ.log(i0);
+IJ.selectWindow(i0);
 
 
 // imp.show();
@@ -46,7 +49,7 @@ imp = IJ.getImage();
 //i = imp.nSlices();
 
 //imp.duplicate();
-
+ 
 IJ.run("StackReg", "transformation=[Rigid Body]");
 
 gd = new GenericDialog("Options");
@@ -84,14 +87,32 @@ corr = gd.getNextNumber();
 
 
 // Temp mute:
-var path = IJ.getDirectory("Select a folder to save PIV results");
-IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
+// imp.createNewRoi();
+// imp.getROI();
+//var path = IJ.getDirectory("Select a folder to save PIV results");
+//IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
 
 
 var stackSize = imp.getImageStackSize();
 IJ.log("Slices: " + stackSize);
 
 
+//setBatchMode(true);
+for(s=1;s<stackSize;s++){
+	IJ.run("Duplicate...", "title=[seq_"+s+"] duplicate range="+s+"-"+s+1+"");
+
+	//IJ.selectWindow(title... or id);
+}
+
+var idList = WindowManager.getIDList();
+IJ.log(idList);
+var imageCount = WindowManager.getImageCount();
+IJ.log(imageCount);
+for(s=1;s<imageCount+1;s++){
+	WindowManager.putBehind();
+	
+	WindowManager.removeWindow();(WindowManager.getNthImageID(s));
+}
 
 
 // setBatchMode(true);
