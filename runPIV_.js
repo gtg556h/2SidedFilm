@@ -45,7 +45,7 @@ IJ.log(i0);
 
 
  
-IJ.run("StackReg", "transformation=[Rigid Body]");
+//IJ.run("StackReg", "transformation=[Rigid Body]");
 
 // Original Values:
 //gd = new GenericDialog("Options");
