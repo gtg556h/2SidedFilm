@@ -47,17 +47,33 @@ IJ.log(i0);
  
 IJ.run("StackReg", "transformation=[Rigid Body]");
 
+// Original Values:
+//gd = new GenericDialog("Options");
+//gd.addMessage("PIV Parameters");
+//gd.addNumericField("Side (1,2)", 0, 0);
+//gd.addNumericField("Interrogation window 1", 128, 0);
+//gd.addNumericField("search window 1", 256, 0);
+//gd.addNumericField("vector spacing 1", 64, 0);
+//gd.addNumericField("Interrogation window 2", 64, 0);
+//gd.addNumericField("search window 2", 128, 0);
+//gd.addNumericField("vector spacing 2", 32, 0);
+//gd.addNumericField("Interrogation window 3", 48, 0);
+//gd.addNumericField("search window 3", 96, 0);
+//gd.addNumericField("vector spacing 3", 24, 0);
+//gd.addNumericField("correlation threshold", 0.8, 2);
+
 gd = new GenericDialog("Options");
 gd.addMessage("PIV Parameters");
-gd.addNumericField("Interrogation window 1", 128, 0);
-gd.addNumericField("search window 1", 256, 0);
-gd.addNumericField("vector spacing 1", 64, 0);
-gd.addNumericField("Interrogation window 2", 64, 0);
-gd.addNumericField("search window 2", 128, 0);
-gd.addNumericField("vector spacing 2", 32, 0);
-gd.addNumericField("Interrogation window 3", 48, 0);
-gd.addNumericField("search window 3", 96, 0);
-gd.addNumericField("vector spacing 3", 24, 0);
+gd.addNumericField("Side (1,2)", 0, 0);
+gd.addNumericField("Interrogation window 1", 64, 0);
+gd.addNumericField("search window 1", 128, 0);
+gd.addNumericField("vector spacing 1", 32, 0);
+gd.addNumericField("Interrogation window 2", 32, 0);
+gd.addNumericField("search window 2", 64, 0);
+gd.addNumericField("vector spacing 2", 16, 0);
+gd.addNumericField("Interrogation window 3", 24, 0);
+gd.addNumericField("search window 3", 48, 0);
+gd.addNumericField("vector spacing 3", 12, 0);
 gd.addNumericField("correlation threshold", 0.8, 2);
 
 
@@ -67,6 +83,7 @@ gd.showDialog();
 //    return;
 //}
 
+var side = gd.getNextNumber();
 var piv1 = gd.getNextNumber();
 var sw1 = gd.getNextNumber();
 var vs1 = gd.getNextNumber();
@@ -95,13 +112,14 @@ changes = false;
 for(s=1;s<stackSize;s++){
 	var ss = s + 1;
 	// Incorporate ROI selection in next step
-	IJ.run("Duplicate...", "title=[seq_"+s+"] duplicate range="+s+"-"+ss+"");
+	IJ.run("Duplicate...", "title=[seq_"+s+"_"+side+"] duplicate range="+s+"-"+ss+"");
 	IJ.log("s = " + s);
 	IJ.log("s+1 = " + ss);
     IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
     while(imp2 = WindowManager.getImage(WindowManager.getNthImageID(2))) {
     	// Put save command here...
-    	//imp2.save();
+    	IJ.log(path + imp2.getTitle());
+    	IJ.save(imp2, path + imp2.getTitle() + ".tif");
         imp2.close();
     }
 }
