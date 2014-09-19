@@ -1,15 +1,25 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import postprocessPIVLib as pppl
+from matplotlib import animation
 
-side = 0
-pivN = 1
-nFrames = 19
-dt = 1
+#####################################################
+# Set processing parameters:
+
+side = 0   # Side of film index.  For 2sided film analyses.
+pivN = 1   # PIV Pass to import.  Lowest resolution is 1.
+nFrames = 599  # Number of frames to process
+dt = 0.01 # sec
+baseDirectory = "/Users/brian/working/"   # OSX
+#baseDirectory = "/home/brian/ssd/working/"   # Linux
+
+
+#####################################################
+# Admin and preallocation of arrays:
 
 t = np.arange(0,dt*nFrames,dt)
 
-path = "/Users/brian/working/seq_" + str(1) + "_" + str(side) + "_PIV" + str(pivN) + "_disp.txt"
+path = baseDirectory + "seq_" + str(1) + "_" + str(side) + "_PIV" + str(pivN) + "_disp.txt"
 x_, y_, ux1_, uy1_, mag1_, ang1_, p1_, ux2_, uy2_, mag2_, p2_, ux0_, uy0_, mag0_ = pppl.process(path)
 
 nPreallocate = x_.shape[0]
@@ -30,7 +40,8 @@ uy0 = np.zeros([nPreallocate, nFrames])
 mag0 = np.zeros([nPreallocate, nFrames])
 
 
-
+######################################################
+# Read data into arrays:
 
 for ii in range(0,nFrames):
     
@@ -51,37 +62,14 @@ for ii in range(0,nFrames):
     uy0[:,ii] = uy0_
     mag0[:,ii] = mag0_
 
-repIndex = np.argmax(np.sum(np.abs(mag1), axis=1))
-v = ux1[repIndex, :]
-c = np.zeros(v.shape)
-for ii in range(0, c.shape[0]):
-	c[ii] = np.sum(v[0:ii]) * dt
 
-
-#plt.plot(t, np.mean(mag1, axis=0), t, np.mean(uy1, axis=0))
-if 0:
-    jj = 10
-    fig = plt.figure(figsize=(8,8))
-    ax1 = fig.add_subplot(111)
-    ax1.quiver(x[:,jj], -y[:,jj], ux1[:,jj], -uy1[:,jj], scale=4)
-
-    #ax2 = fig.add_subplot(132)
-    #ax2.quiver(x[:,jj], y[:,jj], ux2[:,jj], uy2[:,jj], scale=None)
-
-    #ax3 = fig.add_subplot(133)
-    #ax3.quiver(x[:,jj], y[:,jj], ux0[:,jj], uy0[:,jj], scale=None)
-    plt.show()
+####################################################
+####################################################
+# Animation of quiver
 
 if 1:
-    import numpy as np
-    from matplotlib import pyplot as plt
-    from matplotlib import animation
-
     fig,ax = plt.subplots(1,1)
     Q = ax.quiver( x[:,0], -y[:,0], ux1[:,0], -uy1[:,0], pivot='mid', color='r', units='inches', scale=1)
-
-    #ax.set_xlim(-1, 7)
-    #ax.set_ylim(-1, 7)
 
     def update_quiver(n, Q, X, Y, nFrames):
         """
@@ -98,13 +86,76 @@ if 1:
 
     # you need to set blit=False, or the first set of arrows never gets
     # cleared on subsequent frames
-    anim = animation.FuncAnimation(fig, update_quiver, fargs=(Q, ux1, uy1, nFrames),
-        interval=10, blit=False)
+    anim = animation.FuncAnimation(fig, update_quiver, fargs=(Q, ux1, uy1, nFrames), interval=10, blit=False)
+
 
     plt.show()
 
+######################################################
+######################################################
+# Coplot animation of quiver and contourf
 
-# path = "samplePIV.txt"
+if 0:
+    ####
+    # Initiate figure and quiver
+    fig = plt.figure(figsize=(10,5))
+    ax1 = fig.add_subplot(121)
+    ax2 = fig.add_subplot(122)
+    Q = ax1.quiver( x[:,0], -y[:,0], ux1[:,0], -uy1[:,0], pivot='mid', color='r', units='inches', scale=1)
 
-#x, y, ux1, uy1, mag1 = pppl.process(path)
+    ######
+    # Preprocessing for contour plot:
+    XC_ = x[:,0]
+    YC_ = y[:,0]
+    nRow = np.where(XC_==XC_[0])[0].size
+    nCol = np.where(YC_==YC_[0])[0].size
+
+    XC = np.zeros((nRow,nCol))
+    YC = np.zeros((nRow,nCol))
+    YC2 = np.zeros((nRow,nCol))
+    mag = np.zeros((nRow,nCol))
+
+    minMag = np.min(mag1)
+    maxMag = np.max(mag1)
+    dLevel = (maxMag - minMag)/10
+    levels = np.arange(minMag,maxMag + dLevel, dLevel)
+    levels = np.arange(minMag, minMag + 6*dLevel, dLevel)
+
+    for ii in range(0,nRow):
+        XC[ii,:] = XC_[ii*nCol:(ii+1)*nCol]
+        YC[ii,:] = YC_[ii*nCol:(ii+1)*nCol]
+        mag[ii,:] = mag1[ii*nCol:(ii+1)*nCol,0]
+
+    C = ax2.contourf(XC, -YC, mag, levels)
+
+    #####
+    def update_quiver(n, Q, C, X, Y, nFrames, nRow, nCol, levels):
+        """
+        updates the horizontal and vertical vector components by a
+        fixed increment on each frame
+        """
+        nn = np.mod(n, nFrames)
+        U = ux1[:,nn]
+        V = -uy1[:,nn]
+
+
+        for ii in range(0,nRow):
+            mag[ii,:] = mag1[ii*nCol:(ii+1)*nCol, np.mod(n, nFrames)]
+
+
+        Q.set_UVC(U,V)
+        #C.set_cmap(mag)
+        C = ax2.contourf(XC, -YC, mag, levels)
+
+        return Q,C
+
+    # you need to set blit=False, or the first set of arrows never gets
+    # cleared on subsequent frames
+    anim = animation.FuncAnimation(fig, update_quiver, fargs=(Q, C, ux1, uy1, nFrames, nRow, nCol, levels), interval=10, blit=False)
+
+    plt.show()
+
+######################################################
+######################################################
+
 
