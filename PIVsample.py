@@ -7,4 +7,4 @@ import PIVLib
 filename=("trial.npz")
 p1 = PIVLib.piv(filename)
 
-p1.quiver()
+#p1.quiver()

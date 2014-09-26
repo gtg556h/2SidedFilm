@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import animation
+from matplotlib.widgets import Slider, Button, RadioButtons
+from matplotlib.patches import Rectangle
 
 # from io import StringIO
 
@@ -13,23 +15,99 @@ class piv(object):
         self.t=data['t']; self.x=data['x']; self.y=data['y']; self.ux1=data['ux1']; self.uy1=data['uy1']; self.mag1=data['mag1']
         self.ang1=data['ang1']; self.p1=data['p1']; self.ux2=data['ux2']; self.uy2=data['uy2']; self.mag2=data['mag2']
         self.p2=data['p2']; self.ux0=data['ux0']; self.uy0=data['uy0']; self.mag0=data['mag0']; self.side=data['side']
-        self.pivN=data['pivN']; self.nFrames=data['nFrames']; self.dt=data['dt']
+        self.pivN=data['pivN']; self.nFrames=data['nFrames']; self.dt=data['dt']; self.dx=data['dx']
 
     #####################################################
     #####################################################
 
 
-    def slider(self):
-        pass
+    def slider(self, scale=1):
+        fig, ax = plt.subplots()
+        plt.subplots_adjust(left=0.12, bottom=0.2)
+
+        #l, = plt.plot(t,s, lw=2, color='red')
+        Q = ax.quiver( self.x[:,0], -self.y[:,0], self.ux1[:,0], -self.uy1[:,0], pivot='mid', color='r', units='inches', scale=scale)
+        #plt.axis([0, 1, -10, 10])
+
+        axcolor = 'lightgoldenrodyellow'
+        #axfreq = plt.axes([0.25, 0.1, 0.65, 0.03], axisbg=axcolor)
+        axframe  = plt.axes([0.12, 0.1, 0.78, 0.03], axisbg=axcolor)
+
+        #sfreq = Slider(axfreq, 'Freq', 0.1, 30.0, valinit=f0)
+        sframe = Slider(axframe, 'Frame', 0, self.nFrames, valinit=0)
+
+        def update(val):
+            n = np.round(sframe.val)
+            #freq = sfreq.val
+
+            U = self.ux1[:,n]
+            V = -self.uy1[:,n]
+            Q.set_UVC(U,V)
+            l.set_ydata(amp*np.sin(2*np.pi*freq*t))
+            fig.canvas.draw_idle()
+
+        #sfreq.on_changed(update)
+        sframe.on_changed(update)
+
+        resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
+        button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
+        def reset(event):
+            #sfreq.reset()
+            sframe.reset()
+        button.on_clicked(reset)
+
+        #rax = plt.axes([0.025, 0.5, 0.15, 0.15], axisbg=axcolor)
+        #radio = RadioButtons(rax, ('red', 'blue', 'green'), active=0)
+        #def colorfunc(label):
+        #    l.set_color(label)
+        #    fig.canvas.draw_idle()
+        #radio.on_clicked(colorfunc)
+
+        plt.show()
 
 
     #####################################################
     #####################################################
 
-    def quiver(self):
+    #def annotate(self):
+
+
+    #    class Annotate(object):
+    #        def __init__(self):
+    #            self.ax = plt.gca()
+    #            self.rect = Rectangle((0,0), 1, 1)
+    #            self.x0 = None
+    #            self.y0 = None
+    #            self.x1 = None
+    #            self.y1 = None
+    #            self.ax.add_patch(self.rect)
+    #            self.ax.figure.canvas.mpl_connect('button_press_event', self.on_press)
+    #            self.ax.figure.canvas.mpl_connect('button_release_event', self.on_release)
+
+    #        def on_press(self, event):
+    #            print('press')
+    #            self.x0 = event.xdata
+    #            self.y0 = event.ydata
+
+    #        def on_release(self, event):
+    #            print('release')
+    #            self.x1 = event.xdata
+    #            self.y1 = event.ydata
+    #            self.rect.set_width(self.x1 - self.x0)
+    #            self.rect.set_height(self.y1 - self.y0)
+    #            self.rect.set_xy((self.x0, self.y0))
+    #            self.ax.figure.canvas.draw()
+
+    #    a = Annotate()
+    #    plt.show()
+
+    #####################################################
+    #####################################################
+
+    def quiver(self, scale=1):
         # Animation of quiver
         fig,ax = plt.subplots(1,1)
-        Q = ax.quiver( self.x[:,0], -self.y[:,0], self.ux1[:,0], -self.uy1[:,0], pivot='mid', color='r', units='inches', scale=1)
+        Q = ax.quiver( self.x[:,0], -self.y[:,0], self.ux1[:,0], -self.uy1[:,0], pivot='mid', color='r', units='inches', scale=scale)
 
         def update_quiver(n, Q, X, Y, nFrames):
             """
@@ -53,13 +131,13 @@ class piv(object):
     ######################################################
     ######################################################
 
-    def quiverPlusContour(self):
+    def quiverPlusContour(self, scale=1):
         # Coplot animation of quiver and contourf
         # Initiate figure and quiver
         fig = plt.figure(figsize=(10,5))
         ax1 = fig.add_subplot(121)
         ax2 = fig.add_subplot(122)
-        Q = ax1.quiver( self.x[:,0], -self.y[:,0], self.ux1[:,0], -self.uy1[:,0], pivot='mid', color='r', units='inches', scale=1)
+        Q = ax1.quiver( self.x[:,0], -self.y[:,0], self.ux1[:,0], -self.uy1[:,0], pivot='mid', color='r', units='inches', scale=scale)
 
         ######
         # Preprocessing for contour plot:
@@ -112,3 +190,34 @@ class piv(object):
         anim = animation.FuncAnimation(fig, update_quiver, fargs=(Q, C, self.ux1, self.uy1, self.nFrames, nRow, nCol, levels), interval=10, blit=False)
 
         plt.show()
+
+
+
+
+
+
+#class Annotate(object):
+#    def __init__(self):
+#        self.ax = plt.gca()
+#        self.rect = Rectangle((0,0), 1, 1)
+#        self.x0 = None
+#        self.y0 = None
+#        self.x1 = None
+#        self.y1 = None
+#        self.ax.add_patch(self.rect)
+#        self.ax.figure.canvas.mpl_connect('button_press_event', self.on_press)
+#        self.ax.figure.canvas.mpl_connect('button_release_event', self.on_release)
+
+#    def on_press(self, event):
+#        print('press')
+#        self.x0 = event.xdata
+#        self.y0 = event.ydata
+
+#    def on_release(self, event):
+#        print('release')
+#        self.x1 = event.xdata
+#        self.y1 = event.ydata
+#        self.rect.set_width(self.x1 - self.x0)
+#        self.rect.set_height(self.y1 - self.y0)
+#        self.rect.set_xy((self.x0, self.y0))
+#        self.ax.figure.canvas.draw()

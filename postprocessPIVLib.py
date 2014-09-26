@@ -64,7 +64,7 @@ def readFrame(path):
     return x, y, ux1, uy1, mag1, ang1, p1, ux2, uy2, mag2, p2, ux0, uy0, mag0
 
 
-def process(baseDirectory, outFilename, side, pivN, nFrames, dt):
+def process(baseDirectory, outFilename, side, pivN, nFrames, dt, dx):
 
     t = np.arange(0, dt*nFrames, dt)
 
@@ -107,6 +107,10 @@ def process(baseDirectory, outFilename, side, pivN, nFrames, dt):
         uy0[:,ii] = uy0_
         mag0[:,ii] = mag0_
 
-    np.savez(outFilename, t=t, x=x, y=y, ux1=ux1, uy1=uy1, mag1=mag1, ang1=ang1, p1=p1, ux2=ux2, uy2=uy2, mag2=mag2, p2=p2, ux0=ux0, uy0=uy0, mag0=mag0, side=side, pivN=pivN, nFrames=nFrames, dt=dt)
+    # Apply scaling:
+    x = x*dx; y=y*dx
+    ux1 = ux1*dx/dt; uy1 = uy1*dx/dt; ux2 = ux2*dx/dt; uy2 = uy2*dx/dt; ux0 = ux0*dx/dt; uy0 = uy0*dx/dt; 
+
+    np.savez(outFilename, t=t, x=x, y=y, ux1=ux1, uy1=uy1, mag1=mag1, ang1=ang1, p1=p1, ux2=ux2, uy2=uy2, mag2=mag2, p2=p2, ux0=ux0, uy0=uy0, mag0=mag0, side=side, pivN=pivN, nFrames=nFrames, dt=dt, dx=dx)
 
 
