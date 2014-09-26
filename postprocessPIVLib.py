@@ -1,7 +1,8 @@
 import numpy as np
 # from io import StringIO
 
-def process(path):
+def readFrame(path):
+
     f = open(path, 'r')
     x = []
     y = []
@@ -61,5 +62,51 @@ def process(path):
     # flag = 
 
     return x, y, ux1, uy1, mag1, ang1, p1, ux2, uy2, mag2, p2, ux0, uy0, mag0
+
+
+def process(baseDirectory, outFilename, side, pivN, nFrames, dt):
+
+    t = np.arange(0, dt*nFrames, dt)
+
+    path = baseDirectory + "seq_" + str(1) + "_" + str(side) + "_PIV" + str(pivN) + "_disp.txt"
+    x_, y_, ux1_, uy1_, mag1_, ang1_, p1_, ux2_, uy2_, mag2_, p2_, ux0_, uy0_, mag0_ = readFrame(path)
+
+    nPreallocate = x_.shape[0]
+
+    x = np.zeros([nPreallocate, nFrames])
+    y = np.zeros([nPreallocate, nFrames])
+    ux1 = np.zeros([nPreallocate, nFrames])
+    uy1 = np.zeros([nPreallocate, nFrames])
+    mag1 = np.zeros([nPreallocate, nFrames])
+    ang1 = np.zeros([nPreallocate, nFrames])
+    p1 = np.zeros([nPreallocate, nFrames])
+    ux2 = np.zeros([nPreallocate, nFrames])
+    uy2 = np.zeros([nPreallocate, nFrames])
+    mag2 = np.zeros([nPreallocate, nFrames])
+    p2 = np.zeros([nPreallocate, nFrames])
+    ux0 = np.zeros([nPreallocate, nFrames])
+    uy0 = np.zeros([nPreallocate, nFrames])
+    mag0 = np.zeros([nPreallocate, nFrames])
+
+    for ii in range(0,nFrames):
+        
+        path = baseDirectory + "seq_" + str(ii+1) + "_" + str(side) + "_PIV" + str(pivN) + "_disp.txt"
+        x_, y_, ux1_, uy1_, mag1_, ang1_, p1_, ux2_, uy2_, mag2_, p2_, ux0_, uy0_, mag0_ = readFrame(path)
+        x[:,ii] = x_
+        y[:,ii] = y_
+        ux1[:,ii] = ux1_
+        uy1[:,ii] = uy1_
+        mag1[:,ii] = mag1_
+        ang1[:,ii] = ang1_
+        p1[:,ii] = p1_
+        ux2[:,ii] = ux2_
+        uy2[:,ii] = uy2_
+        mag2[:,ii] = mag2_
+        p2[:,ii] = p2_
+        ux0[:,ii] = ux0_
+        uy0[:,ii] = uy0_
+        mag0[:,ii] = mag0_
+
+    np.savez(outFilename, t=t, x=x, y=y, ux1=ux1, uy1=uy1, mag1=mag1, ang1=ang1, p1=p1, ux2=ux2, uy2=uy2, mag2=mag2, p2=p2, ux0=ux0, uy0=uy0, mag0=mag0, side=side, pivN=pivN, nFrames=nFrames, dt=dt)
 
 

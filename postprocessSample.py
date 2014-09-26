@@ -1,5 +1,5 @@
 import numpy as np
-import postprocessPIVLib2 as PL
+import postprocessPIVLib as PL
 
 side = 0   # Side of film index.  For 2sided film analyses.
 pivN = 1   # PIV Pass to import.  Lowest resolution is 1.

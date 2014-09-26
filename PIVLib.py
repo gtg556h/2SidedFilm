@@ -1,112 +1,114 @@
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import animation
+
 # from io import StringIO
 
-def readFrame(path):
+class piv(object):
+    def __init__(self, filename):
+        print('Importing data:')
 
-    f = open(path, 'r')
-    x = []
-    y = []
-    ux1 = []
-    uy1 = []
-    mag1 = []
-    ang1 = []
-    p1 = [] 
-    ux2 = [] 
-    uy2 = [] 
-    mag2 = [] 
-    ang2 = []
-    p2 = []
-    ux0 = []
-    uy0 = []
-    mag0 = []
-    # flag = 
+        # Import data from .npz:
+        data = np.load(filename)
+        self.t=data['t']; self.x=data['x']; self.y=data['y']; self.ux1=data['ux1']; self.uy1=data['uy1']; self.mag1=data['mag1']
+        self.ang1=data['ang1']; self.p1=data['p1']; self.ux2=data['ux2']; self.uy2=data['uy2']; self.mag2=data['mag2']
+        self.p2=data['p2']; self.ux0=data['ux0']; self.uy0=data['uy0']; self.mag0=data['mag0']; self.side=data['side']
+        self.pivN=data['pivN']; self.nFrames=data['nFrames']; self.dt=data['dt']
+
+    #####################################################
+    #####################################################
 
 
-
-    for line in f:
-        line = line.strip()
-        columns = line.split()
-        x.append(columns[0])
-        y.append(columns[1])
-        ux1.append(columns[2])
-        uy1.append(columns[3])
-        mag1.append(columns[4])
-        ang1.append(columns[4])
-        p1.append(columns[4])
-        ux2.append(columns[4])
-        uy2.append(columns[4])
-        mag2.append(columns[4])
-        ang2.append(columns[4]) 
-        p2.append(columns[4])
-        ux0.append(columns[4]) 
-        uy0.append(columns[4])
-        mag0.append(columns[4]) 
- 
-
-    f.close()
-    x = np.asarray(x).astype(float)
-    y = np.asarray(y).astype(float)
-    ux1 = np.asarray(ux1).astype(float)
-    uy1 = np.asarray(uy1).astype(float)
-    mag1 = np.asarray(mag1).astype(float)
-    ang1 = np.asarray(ang1).astype(float)
-    p1 = np.asarray(p1).astype(float)
-    ux2 = np.asarray(ux2).astype(float)
-    uy2 = np.asarray(uy2).astype(float)
-    mag2 = np.asarray(mag2).astype(float)
-    ang2 = np.asarray(ang2).astype(float)
-    p2 = np.asarray(p2).astype(float)
-    ux0 = np.asarray(ux0).astype(float)
-    uy0 = np.asarray(uy0).astype(float)
-    mag0 = np.asarray(mag0).astype(float)
-    # flag = 
-
-    return x, y, ux1, uy1, mag1, ang1, p1, ux2, uy2, mag2, p2, ux0, uy0, mag0
+    def slider(self):
+        pass
 
 
-def process(baseDirectory, outFilename, side, pivN, nFrames, dt):
+    #####################################################
+    #####################################################
 
-    t = np.arange(0, dt*nFrames, dt)
+    def quiver(self):
+        # Animation of quiver
+        fig,ax = plt.subplots(1,1)
+        Q = ax.quiver( self.x[:,0], -self.y[:,0], self.ux1[:,0], -self.uy1[:,0], pivot='mid', color='r', units='inches', scale=1)
 
-    path = baseDirectory + "seq_" + str(1) + "_" + str(side) + "_PIV" + str(pivN) + "_disp.txt"
-    x_, y_, ux1_, uy1_, mag1_, ang1_, p1_, ux2_, uy2_, mag2_, p2_, ux0_, mag0_ = readFrame(path)
+        def update_quiver(n, Q, X, Y, nFrames):
+            """
+            updates the horizontal and vertical vector components by a
+            fixed increment on each frame
+            """
+            nn = np.mod(n, self.nFrames)
+            U = self.ux1[:,nn]
+            V = -self.uy1[:,nn]
 
-    nPreallocate = x_.shape[0]
+            Q.set_UVC(U,V)
 
-    x = np.zeros([nPreallocate, nFrames])
-    y = np.zeros([nPreallocate, nFrames])
-    ux1 = np.zeros([nPreallocate, nFrames])
-    uy1 = np.zeros([nPreallocate, nFrames])
-    mag1 = np.zeros([nPreallocate, nFrames])
-    ang1 = np.zeros([nPreallocate, nFrames])
-    p1 = np.zeros([nPreallocate, nFrames])
-    ux2 = np.zeros([nPreallocate, nFrames])
-    uy2 = np.zeros([nPreallocate, nFrames])
-    mag2 = np.zeros([nPreallocate, nFrames])
-    p2 = np.zeros([nPreallocate, nFrames])
-    ux0 = np.zeros([nPreallocate, nFrames])
-    uy0 = np.zeros([nPreallocate, nFrames])
-    mag0 = np.zeros([nPreallocate, nFrames])
+            return Q,
 
-    for ii in range(0,nFrames):
-        
-        path = baseDirectory + "seq_" + str(ii+1) + "_" + str(side) + "_PIV" + str(pivN) + "_disp.txt"
-        x_, y_, ux1_, uy1_, mag1_, ang1_, p1_, ux2_, uy2_, mag2_, p2_, ux0_, uy0_, mag0_ = readFrame(path)
-        x[:,ii] = x_
-        y[:,ii] = y_
-        ux1[:,ii] = ux1_
-        uy1[:,ii] = uy1_
-        mag1[:,ii] = mag1_
-        ang1[:,ii] = ang1_
-        p1[:,ii] = p1_
-        ux2[:,ii] = ux2_
-        uy2[:,ii] = uy2_
-        mag2[:,ii] = mag2_
-        p2[:,ii] = p2_
-        ux0[:,ii] = ux0_
-        uy0[:,ii] = uy0_
-        mag0[:,ii] = mag0_
+        # you need to set blit=False, or the first set of arrows never gets
+        # cleared on subsequent frames
+        anim = animation.FuncAnimation(fig, update_quiver, fargs=(Q, self.ux1, self.uy1, self.nFrames), interval=10, blit=False)
 
-    np.savez(outputFilename, x=x, y=y, ux1=ux1, uy1=uy1, mag1=mag1, ang1=ang1, p1=p1, ux2=ux2, uy2=uy2, mag2=mag2, p2=p2, ux0=ux0, uy0=uy0, mag0=mag0)
+        plt.show()
+
+    ######################################################
+    ######################################################
+
+    def quiverPlusContour(self):
+        # Coplot animation of quiver and contourf
+        # Initiate figure and quiver
+        fig = plt.figure(figsize=(10,5))
+        ax1 = fig.add_subplot(121)
+        ax2 = fig.add_subplot(122)
+        Q = ax1.quiver( self.x[:,0], -self.y[:,0], self.ux1[:,0], -self.uy1[:,0], pivot='mid', color='r', units='inches', scale=1)
+
+        ######
+        # Preprocessing for contour plot:
+        XC_ = self.x[:,0]
+        YC_ = self.y[:,0]
+        nRow = np.where(XC_==XC_[0])[0].size
+        nCol = np.where(YC_==YC_[0])[0].size
+
+        XC = np.zeros((nRow,nCol))
+        YC = np.zeros((nRow,nCol))
+        YC2 = np.zeros((nRow,nCol))
+        mag = np.zeros((nRow,nCol))
+
+        minMag = np.min(self.mag1)
+        maxMag = np.max(self.mag1)
+        dLevel = (maxMag - minMag)/10
+        levels = np.arange(minMag,maxMag + dLevel, dLevel)
+        levels = np.arange(minMag, minMag + 6*dLevel, dLevel)
+
+        for ii in range(0,nRow):
+            XC[ii,:] = XC_[ii*nCol:(ii+1)*nCol]
+            YC[ii,:] = YC_[ii*nCol:(ii+1)*nCol]
+            mag[ii,:] = self.mag1[ii*nCol:(ii+1)*nCol,0]
+
+        C = ax2.contourf(XC, -YC, mag, levels)
+
+        #####
+        def update_quiver(n, Q, C, X, Y, nFrames, nRow, nCol, levels):
+            """
+            updates the horizontal and vertical vector components by a
+            fixed increment on each frame
+            """
+            nn = np.mod(n, self.nFrames)
+            U = self.ux1[:,nn]
+            V = -self.uy1[:,nn]
 
 
+            for ii in range(0,nRow):
+                mag[ii,:] = self.mag1[ii*nCol:(ii+1)*nCol, np.mod(n, self.nFrames)]
+
+
+            Q.set_UVC(U,V)
+            #C.set_cmap(mag)
+            C = ax2.contourf(XC, -YC, mag, levels)
+
+            return Q,C
+
+        # you need to set blit=False, or the first set of arrows never gets
+        # cleared on subsequent frames
+        anim = animation.FuncAnimation(fig, update_quiver, fargs=(Q, C, self.ux1, self.uy1, self.nFrames, nRow, nCol, levels), interval=10, blit=False)
+
+        plt.show()
