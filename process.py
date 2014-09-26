@@ -67,7 +67,7 @@ for ii in range(0,nFrames):
 ####################################################
 # Animation of quiver
 
-if 1:
+if 0:
     fig,ax = plt.subplots(1,1)
     Q = ax.quiver( x[:,0], -y[:,0], ux1[:,0], -uy1[:,0], pivot='mid', color='r', units='inches', scale=1)
 
@@ -95,7 +95,7 @@ if 1:
 ######################################################
 # Coplot animation of quiver and contourf
 
-if 0:
+if 1:
     ####
     # Initiate figure and quiver
     fig = plt.figure(figsize=(10,5))
