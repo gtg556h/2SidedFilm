@@ -39,6 +39,9 @@ class RectangleBuilder:
         rect = ax.add_patch(patches.Rectangle((x0_,y0_),(x1_-x0_),(y1_-y0_)))
         self.fig.canvas.draw()
 
+    
+    def releaseDraw(self):
+
 
 fig = plt.figure()
 ax = fig.add_subplot(111)
