@@ -1,13 +1,7 @@
 importClass(Packages.ij.IJ);
-importClass(Packages.ij.ImagePlus);
-importClass(Packages.ij.ImageStack);
-importClass(Packages.ij.process.ImageProcessor);
-importClass(Packages.ij.gui.Toolbar);
 importClass(Packages.ij.WindowManager);
 importClass(Packages.ij.plugin.frame.RoiManager);
 importClass(Packages.ij.gui.GenericDialog);
-// importClass(Packages.ij.plugin.Plugin);
-
 
 
 // View fields:
@@ -115,34 +109,18 @@ IJ.log("Slices: " + stackSize);
 
 changes = false;
 //setBatchMode(true);
-
-stack = imp.getStack();
-
 for(s=1;s<stackSize;s++){
 	var ss = s + 1;
 	// Incorporate ROI selection in next step
-	// IJ.run("Duplicate...", "title=[seq_"+s+"_"+side+"] duplicate range="+s+"-"+ss+"");
-
-    stack2 = ImageStack(stack.getWidth(), stack.getHeight(), stack.getColorModel());
-    ip = stack.getProcessor(s);
-    
-    ip2 = ip.createProcessor(stack.getWidth(), stack.getHeight());
-    ip2.insert(stack.getProcessor(s),0,0);
-    stack2.addSlice(null, ip2);
-
-    ip2 = ip.createProcessor(stack.getWidth(), stack.getHeight());
-    ip2.insert(stack.getProcessor(ss),0,0);
-    stack2.addSlice(null, ip2);
-
-    imp2 = ImagePlus("current", stack2);
-    imp2.show();
-
+	IJ.run("Duplicate...", "title=[seq_"+s+"_"+side+"] duplicate range="+s+"-"+ss+"");
 	IJ.log("s = " + s);
 	IJ.log("s+1 = " + ss);
     IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
-
-    imp2.close();
-
-    
+    while(imp2 = WindowManager.getImage(WindowManager.getNthImageID(2))) {
+    	// Put save command here...
+    	IJ.log(path + imp2.getTitle());
+    	IJ.save(imp2, path + imp2.getTitle() + ".tif");
+        imp2.close();
+    }
 }
 
