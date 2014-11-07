@@ -40,7 +40,7 @@ class RectangleBuilder:
         self.fig.canvas.draw()
 
     
-    def releaseDraw(self):
+    #def releaseDraw(self):
 
 
 fig = plt.figure()
