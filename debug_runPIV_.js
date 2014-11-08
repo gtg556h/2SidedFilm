@@ -1,0 +1,139 @@
+importClass(Packages.ij.IJ);
+importClass(Packages.ij.ImagePlus);
+importClass(Packages.ij.ImageStack);
+importClass(Packages.ij.process.ImageProcessor);
+importClass(Packages.ij.gui.Toolbar);
+importClass(Packages.ij.WindowManager);
+importClass(Packages.ij.plugin.frame.RoiManager);
+importClass(Packages.ij.gui.GenericDialog);
+importClass(javacv.com.googlecode.javacv.cpp.opencv_core.*);
+
+// importClass(Packages.ij.plugin.Plugin);
+
+// Run from command line with "Fiji --headless path.js"
+
+
+// View fields:
+// s=""; for (a in imp) {s += " " + a; }
+// for (a in gd) {
+//    IJ.log(a);
+// }
+
+
+// To run PIV (different versions!!!):
+// run("iterative PIV(Advanced)..."," piv1=128 sw1=256 vs1=64 piv2=64 sw2=128 vs2=32 piv3=50 sw3=100 vs3=50 correlation=0.6 batch path=[/Users/brian/directory/] ");
+
+// IJ.run(imp, "iterative PIV(Cross-Correlation)...", "piv1=128 piv2=64 piv3=0 what=[Accept this PIV and output] noise=0.20 threshold=5 c1=3 c2=1 save=D:\20110819b\out\segmented_89.tif.txt batch");
+
+// Use "save" instead of "path" if writing javascript!!!!
+
+// piv1, sw1, vs1 are interrogation window, search window, and vector spacing for 1st pass...
+// correlation is threshold value of the correlation peak
+// batch specifies the batch mode
+// path is the location that results will be saved
+
+
+// To use output data:
+// x |   y  |  ux1  |  uy1  |  mag1  |  ang1  |  p1  |  ux2  |  uy2  |  mag2  |  ang2  |  p2  |  ux0  |  uy0  |  mag0  |  flag
+
+// (x,y) is the position of the vector (center of the interrogation window).
+// ux1, uy1 are the x and y component of the vector (displacement) obtained from the 1st correlation peak.
+// mag1 is the magnitude (norm) of the vector.
+// ang1, is the angle between the current vector and the vector interpolated from previous PIV iteration.
+// p1 is the correlation value of the 1st peak.
+// ux2,uy2,mag2,ang2,p2 are the values for the vector obtained from the 2nd correlation peak.
+// ux0, uy0, mag0 are the vector value at (x,y) interpolated from previous PIV iteration.
+// flag is a column used for mark whether this vector value is interpolated (marked as 999) or switched between 1st and 2nd peak (marked as 21), or invalid (-1).
+
+// Only the first 5 columns are used for vector plot. 
+
+//imp = IJ.getImage();
+imp = IJ.openImage("/Users/brian/local/2imageStack.tif");
+//imp.show();
+//var i0 = imp.getID();
+//i0 = WindowManager.getCurrentWindow();
+//IJ.log(i0);
+
+
+ 
+//IJ.run("StackReg", "transformation=[Rigid Body]");
+
+
+//gd = new GenericDialog("Options");
+//gd.addMessage("PIV Parameters");
+//gd.addNumericField("Side (1,2)", 0, 0);
+//gd.addNumericField("Interrogation window 1", 64, 0);
+//gd.addNumericField("search window 1", 128, 0);
+//gd.addNumericField("vector spacing 1", 32, 0);
+//gd.addNumericField("Interrogation window 2", 32, 0);
+//gd.addNumericField("search window 2", 64, 0);
+//gd.addNumericField("vector spacing 2", 16, 0);
+//gd.addNumericField("Interrogation window 3", 24, 0);
+//gd.addNumericField("search window 3", 48, 0);
+//gd.addNumericField("vector spacing 3", 12, 0);
+//gd.addNumericField("correlation threshold", 0.8, 2);
+
+
+////gd.showDialog();
+
+//if (gd.wasCancelled()) {
+//    return;
+//}
+
+var side = 0;//gd.getNextNumber();
+var piv1 = 64;//gd.getNextNumber();
+var sw1 = 128;//gd.getNextNumber();
+var vs1 = 32;//gd.getNextNumber();
+var piv2 = 32;//gd.getNextNumber();
+var sw2 = 64;//gd.getNextNumber();
+var vs2 = 16;//gd.getNextNumber();
+var piv3 = 0;//gd.getNextNumber();
+var sw3 = 0;//gd.getNextNumber();
+var vs3 = 0;//gd.getNextNumber();
+var corr = 0.8;//gd.getNextNumber();
+
+
+// Temp mute:
+// imp.createNewRoi();
+// imp.getROI();
+
+//var path = IJ.getDirectory("Select a folder to save PIV results");
+path = ["/Users/brian/working/"]
+
+
+var stackSize = imp.getImageStackSize();
+IJ.log("Slices: " + stackSize);
+
+changes = false;
+//setBatchMode(true);
+
+stack = imp.getStack();
+
+for(s=1;s<stackSize;s++){
+	var ss = s + 1;
+	// Incorporate ROI selection in next step
+	// IJ.run("Duplicate...", "title=[seq_"+s+"_"+side+"] duplicate range="+s+"-"+ss+"");
+
+    stack2 = ImageStack(stack.getWidth(), stack.getHeight(), stack.getColorModel());
+    ip = stack.getProcessor(s);
+    
+    ip2 = ip.createProcessor(stack.getWidth(), stack.getHeight());
+    ip2.insert(stack.getProcessor(s),0,0);
+    stack2.addSlice(null, ip2);
+
+    ip2 = ip.createProcessor(stack.getWidth(), stack.getHeight());
+    ip2.insert(stack.getProcessor(ss),0,0);
+    stack2.addSlice(null, ip2);
+
+    imp2 = ImagePlus("current", stack2);
+    //imp2.show();
+
+	IJ.log("s = " + s);
+	IJ.log("s+1 = " + ss);
+    IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
+
+    imp2.close();
+
+    
+}
+
