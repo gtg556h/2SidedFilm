@@ -101,7 +101,7 @@ var corr = gd.getNextNumber();
 // imp.getROI();
 
 //var path = IJ.getDirectory("Select a folder to save PIV results");
-path = ["/home/brian/ssd/working/"]
+path = ["/home/brian/working/PIV/"]
 
 
 var stackSize = imp.getImageStackSize();
