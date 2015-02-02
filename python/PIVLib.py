@@ -8,6 +8,11 @@ import matplotlib.patches as patches
 
 # Notes:
 
+# Current status: Works!
+# Initialize piv object
+# Execute 'p1.analyze(scale, screenID0
+# View resultant data via p1.screen[i]
+
 # The skeleton of the framework below has been laid.
 # Currently, we can instantiate a member of piv class
 # Then: varname = pivInstance.analyzed(pivInstance, 100) generates an instance of class roi, with all required vars
@@ -75,6 +80,18 @@ class piv(object):
 
     #####################################################
     #####################################################
+    def analyze(self, scale=1, screenID='default'):
+
+        try:
+            self.screen
+        except AttributeError:
+            self.screen = []
+        
+        self.screen.append(self.analyzed(self, scale, screenID))
+
+
+
+    ######################################################  
 
     class analyzed:
 
@@ -138,9 +155,10 @@ class piv(object):
                 self.fig.canvas.draw()
 
         ################################################
-        def __init__(self, piv, scale=1):
+        def __init__(self, piv, scale=1, screenID='default'):
 
             print('analysis loop')
+            self.analysisID = screenID
             fig, ax = plt.subplots()
             plt.subplots_adjust(left=0.12, bottom=0.2)
 
@@ -178,8 +196,6 @@ class piv(object):
 
 
 
-    def scan(self, scale=1):
-        self.scanned = analyzed(self, scale=scale)
            
 
 
