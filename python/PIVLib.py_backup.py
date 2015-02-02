@@ -8,12 +8,6 @@ import matplotlib.patches as patches
 
 # Notes:
 
-# The skeleton of the framework below has been laid.
-# Currently, we can instantiate a member of piv class
-# Then: varname = pivInstance.analyzed(pivInstance, 100) generates an instance of class roi, with all required vars
-# Need to restructure class layout to make it run more logically!
-
-
 # Implemented ROI selection in Slider method
 # Generate new routine, using Slider base, where integer selection of multiple ROIs generates a list of ROIs.
 # After ROI list generation, sieve function is performed on EACH roi, generating mean ux1, uy1 etc... computations on each ROI
@@ -100,7 +94,7 @@ class piv(object):
 
 
         ###########################################
-        class RectangleBuilder2:
+        class RectangleBuilder:
             def __init__(self, ax):
                 print('Select roi')
                 self.fig = ax.get_figure()
@@ -111,30 +105,24 @@ class piv(object):
                 self.y1 = []
 
             def connect(self):
-                self.cidpress = self.fig.canvas.mpl_connect('button_press_event', self.on_press)
-                self.cidpress = self.fig.canvas.mpl_connect('button_release_event', self.on_release)
+                self.cidpress = fig.canvas.mpl_connect('button_press_event', self.on_press)
+                self.cidpress = fig.canvas.mpl_connect('button_release_event', self.on_release)
 
             def on_press(self, event):
                 print('click', event)
                 if event.inaxes!=self.ax: return
-                self.x0_ = event.xdata
-                self.y0_ = -event.ydata
+                self.x0.append(event.xdata)
+                self.y0.append(event.ydata)
 
             def on_release(self, event):
                 print('release', event)
                 if event.inaxes!=self.ax: return
-                self.x1_ = event.xdata
-                self.y1_ = -event.ydata
-                self.x0.append(np.min([self.x0_, self.x1_]))
-                self.y0.append(np.min([self.y0_, self.y1_]))
-                self.x1.append(np.max([self.x0_, self.x1_]))
-                self.y1.append(np.max([self.y0_, self.y1_]))
-                del [self.x0_, self.x1_, self.y0_, self.y1_]
+                self.x1.append(event.xdata)
+                self.y1.append(event.ydata)
                 self.draw_rectangle()
 
             def draw_rectangle(self):
-                print(self.x0[-1],self.y0[-1])
-                rect = self.ax.add_patch(patches.Rectangle((self.x0[-1], -self.y0[-1]), (self.x1[-1] - self.x0[-1]), (-self.y1[-1] + self.y0[-1])))
+                rect = ax.add_patch(patches.Rectangle((self.x0[-1], self.y0[-1]), (self.x1[-1] - self.x0[-1]), (self.y1[-1] - self.y0[-1])))
                 self.fig.canvas.draw()
 
         ################################################
@@ -152,8 +140,8 @@ class piv(object):
 
             def update(val):
                 n = np.round(sframe.val)
-                U = piv.ux1[:,n]
-                V = -piv.uy1[:,n]
+                u = piv.ux1[:,n]
+                v = -piv.uy1[:,n]
                 Q.set_UVC(U,V)
                 fig.canvas.draw_idle()
 
@@ -168,8 +156,7 @@ class piv(object):
                 sframe.reset()
             def roiSelect(event):
                 print('Select ROI')
-                self.roi = self.RectangleBuilder2(ax)
-                self.roi.connect()
+                self.roi = self.RectangleBuilder(ax)
 
             button2.on_clicked(reset)
             button1.on_clicked(roiSelect)
