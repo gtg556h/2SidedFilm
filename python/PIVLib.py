@@ -57,7 +57,36 @@ class ROI:
             self.ux2[i] = np.mean(piv.ux2[self.indices, i])
             self.uy2[i] = np.mean(piv.uy2[self.indices, i])
 
-        
+
+def plotFlip(roi):
+    # Need to add buttons for flip x, flip y, complete,
+    # Need to adjust formatting
+
+    nRoi = roi.shape[0]
+    for i in range(0,1):#nRoi):
+        fig = plt.figure(figsize=(5,5))
+        fig.subplots_adjust(top=0.9, bottom=0.15, left=0.1, right=0.95, wspace=0.1, hspace=0.1)
+        ax1 = fig.add_subplot(221)
+        ax1.plot(roi[0].t, roi[i].ux1)
+        #ax1.title = 'Flip x?'
+        ax2 = fig.add_subplot(222)
+        ax2.plot(roi[0].t, roi[0].ux1)
+        ax3 = fig.add_subplot(223)
+        ax3.plot(roi[0].t, roi[i].uy1)
+        #ax3.title = 'Flip y?'
+        ax4 = fig.add_subplot(224)
+        ax4.plot(roi[0].t, roi[0].uy0)
+
+
+
+
+        plt.show()
+
+        plt.close(fig)
+
+    return 
+   
+
         
 
 class RSOI:
@@ -80,8 +109,12 @@ class RSOI:
         self.roi = np.asarray(self.roi)
 
         # Script to flip contractile functions....
-
         nRoi = self.roi.shape[0]
+        print(nRoi)
+
+        plotFlip(self.roi)
+
+
         for i in range(0, nRoi):
             self.ux0 = self.ux0 + self.roi[i].ux0/nRoi
             self.ux1 = self.ux1 + self.roi[i].ux1/nRoi
