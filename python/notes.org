@@ -1,0 +1,15 @@
+NOTES
+
+* class PIV: parent construct.  Holds row data, with attributes for 
+** basic visualization
+** Selection of rsoi (region sets of interest)
+** BASIC data processing in rsoi (ie, computation of temporal variation of spatial means of a given attribute
+
+** Sample use:
+    > filename = 'sample.npz'
+    > piv1 = PIVLib.PIV(filename)
+    > piv1.selectRegionSet(plotScale=100, rsoiID='set1')
+    > set1 = piv1.rsoi[0]
+
+* Class RSOI:
+** Extracted from PIV, ie, RSOI = pivInstance.
