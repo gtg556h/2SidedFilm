@@ -9,6 +9,12 @@ import pdb
 
 # Notes:
 
+# Current status: Functional ROI and RSOI classes.  Plot flipping for
+# consistent peak orientation by visual inspection implemented.  Now 
+# just need to integrate post processing!  Peak detection, averaging of 
+# individual ROIs in RSOI representative functions, phase conversion,
+# and relative phase analysis!!!!
+
 # Current status: Works!
 # Initialize piv object
 # Execute 'p1.analyze(scale, screenID0
@@ -35,6 +41,9 @@ import pdb
 
 
 class ROI:
+    def zeroMean(self,attr):
+        attr = attr - np.mean(attr)
+
     def __init__(self, t, piv, roiParam, roiIndex):
         self.t = t
 
@@ -57,6 +66,10 @@ class ROI:
             self.uy1[i] = np.mean(piv.uy1[self.indices, i])
             self.ux2[i] = np.mean(piv.ux2[self.indices, i])
             self.uy2[i] = np.mean(piv.uy2[self.indices, i])
+    
+        self.zeroMean(self.ux0); self.zeroMean(self.ux1); self.zeroMean(self.ux2)
+        self.zeroMean(self.uy0); self.zeroMean(self.uy1); self.zeroMean(self.uy2)
+
 
 
 def plotFlip(roi):
@@ -64,27 +77,32 @@ def plotFlip(roi):
     # Need to adjust formatting
 
     nRoi = roi.shape[0]
-    for i in range(0,1):#nRoi):
-        flipXState = 0
-        flipYState = 0
-        fig = plt.figure(figsize=(8,8))
-        #fig, ax = plt.subplots()
-        fig.subplots_adjust(top=0.9, bottom=0.15, left=0.1, right=0.95, wspace=0.1, hspace=0.1)
+    for i in range(0,nRoi):
+        #fig = plt.figure(figsize=(8,8))
+        fig = plt.figure()
+        fig.flipXState = 0
+        fig.flipYState = 0
+        fig.subplots_adjust(top=0.9, bottom=0.16, left=0.1, right=0.95, wspace=0.1, hspace=0.1)
         axcolor = 'lightgoldenrodyellow'
         ax1 = fig.add_subplot(221)
+        ax1.set_xticklabels([])
+        ax1.set_ylim([-np.max(np.abs(roi[i].ux1)),np.max(np.abs(roi[i].ux1))])
         line1, = ax1.plot(roi[0].t, roi[i].ux1)
-        #ax1.title = 'Flip x?'
         ax2 = fig.add_subplot(222)
-        line2, = ax2.plot(roi[0].t, roi[0].ux1)
+        ax2.set_xticklabels([])
+        ax2.set_ylim([-np.max(np.abs(roi[i].uy1)),np.max(np.abs(roi[i].uy1))])
+        line2, = ax2.plot(roi[0].t, roi[i].uy1)
         ax3 = fig.add_subplot(223)
-        line3, = ax3.plot(roi[0].t, roi[i].uy1)
-        #ax3.title = 'Flip y?'
-        ax4 = fig.add_subplot(224)
-        line4, = ax4.plot(roi[0].t, roi[0].uy0)
 
-        xFlipAx = plt.axes([0.6, 0.025, 0.1, 0.04])
-        yFlipAx = plt.axes([0.8, 0.025, 0.1, 0.04])
-        completeAx = plt.axes([0.4, 0.025, 0.1, 0.04])
+        ax3.set_ylim([-np.max(np.abs(roi[0].ux1)),np.max(np.abs(roi[0].ux1))])
+        line3, = ax3.plot(roi[0].t, roi[0].ux1)
+        ax4 = fig.add_subplot(224)
+        ax4.set_ylim([-np.max(np.abs(roi[0].uy1)),np.max(np.abs(roi[0].uy1))])
+        line4, = ax4.plot(roi[0].t, roi[0].uy1)
+
+        xFlipAx = plt.axes([0.23, 0.065, 0.1, 0.04])
+        yFlipAx = plt.axes([0.7, 0.065, 0.1, 0.04])
+        completeAx = plt.axes([0.45, 0.025, 0.1, 0.04])
         button3 = Button(completeAx, 'Complete', color=axcolor, hovercolor='0.975')
         button2 = Button(xFlipAx, 'Flip X', color=axcolor, hovercolor='0.975')
         button1 = Button(yFlipAx, 'Flip Y', color=axcolor, hovercolor='0.975')
@@ -93,43 +111,38 @@ def plotFlip(roi):
             # Need to integrate a lambda function or something here...
             # See http://stackoverflow.com/questions/173687/is-it-possible-to-pass-arguments-into-event-bindings
             print('Flip X!')
-            pdb.set_trace()
-            if flipXState == 0:
+            #pdb.set_trace()
+            if fig.flipXState == 0:
                 line1.set_ydata(-roi[i].ux1)
-                flipXState = 1
+                fig.flipXState = 1
             else:
                 line1.set_ydata(roi[i].ux1)
-                flipXState = 0
+                fig.flipXState = 0
             fig.canvas.draw_idle()
 
         def flipY(event):
             print('Flip Y!')
-            if flipYState == 0:
-                line1.set_ydata(-roi[i].uy1)
-                flipYState = 1
+            if fig.flipYState == 0:
+                line2.set_ydata(-roi[i].uy1)
+                fig.flipYState = 1
             else:
-                line1.set_ydata(roi[i].uy1)
-                flipYState = 0
+                line2.set_ydata(roi[i].uy1)
+                fig.flipYState = 0
+            fig.canvas.draw_idle()
  
 
         def completeSelection(event):
-            if flipXState == 1:
+            if fig.flipXState == 1:
                 roi[i].ux1 = -roi[i].ux1
-            if flipYState == 1:
+            if fig.flipYState == 1:
                 roi[i].uy1 = -roi[i].uy1
             plt.close(fig)
+
 
         button3.on_clicked(completeSelection)
         button2.on_clicked(flipX)
         button1.on_clicked(flipY)
-
-
-
-
         plt.show()
-
-        plt.close(fig)
-
     return 
    
 
