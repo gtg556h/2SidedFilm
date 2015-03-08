@@ -1,4 +1,5 @@
 import numpy as np
+import pdb
 # from io import StringIO
 
 def readFrame(path):
@@ -66,6 +67,7 @@ def readFrame(path):
 
 def process(baseDirectory, outFilename, side, pivN, nFrames, dt, dx):
 
+    #pdb.set_trace()
     t = np.arange(0, dt*nFrames, dt)
 
     path = baseDirectory + "seq_" + str(1) + "_" + str(side) + "_PIV" + str(pivN) + "_disp.txt"

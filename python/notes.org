@@ -1,5 +1,6 @@
 NOTES
 
+* Need to add event detection thresholding: Place min and max constraints for identification criteria of peaks!!!!
 * class PIV: parent construct.  Holds row data, with attributes for 
 ** basic visualization
 ** Selection of rsoi (region sets of interest)

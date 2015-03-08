@@ -5,7 +5,8 @@ from matplotlib.widgets import Slider, Button, RadioButtons
 from matplotlib.patches import Rectangle
 import matplotlib.patches as patches
 import pdb
-
+import findEvents
+import syncLib2
 
 # Notes:
 
@@ -181,6 +182,39 @@ class RSOI:
             self.uy0 = self.uy0 + self.roi[i].uy0/nRoi
             self.uy1 = self.uy1 + self.roi[i].uy1/nRoi
             self.uy2 = self.uy2 + self.roi[i].uy2/nRoi
+
+        ampx = np.max(self.ux1) - np.min(self.ux1)
+        ampy = np.max(self.uy1) - np.min(self.uy1)
+        theta = np.arctan(ampy/ampx)
+
+        self.u1 = np.cos(theta)*self.ux1 + np.sin(theta)*self.uy1
+        self.v1 = -np.sin(theta)*self.ux1 + np.cos(theta)*self.uy1
+
+        self.ix = findEvents.findEvents2(self.u1, self.t, (np.max(self.t)-self.t[1]+self.t[0]))
+
+        self.theta, self.ixDiff = syncLib2.phaseGen(self.ix,self.t)
+
+        self.plotMeanFuncs()
+
+    def plotMeanFuncs(self):
+        fig = plt.figure()
+        ax1 = fig.add_subplot(131)
+        line1 = ax1.plot(self.t, self.ux1)
+        ax2 = fig.add_subplot(132)
+        line2 = ax2.plot(self.t, self.uy1)
+        ax3 = fig.add_subplot(133)
+        line3 = ax3.plot(self.t, self.u1)
+        line4 = ax3.plot(self.t[self.ix], self.u1[self.ix], 'ro')
+        plt.show()
+
+    def plotPhaseGen(self):
+        fig = plt.figure()
+        ax1 = fig.add_subplot(121)
+        line1a = ax1.plot(self.t, self.u1)
+        line1b = ax1.plot(self.t[self.ix], self.u1[self.ix], 'ro')
+        ax2 = fig.add_subplot(122)
+        line2 = ax2.plot(self.theta)
+        plt.show()
 
 
 
