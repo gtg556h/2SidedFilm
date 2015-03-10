@@ -82,6 +82,7 @@ class RSOI:
         self.roiParam = piv.rsoi[setIndex].roiParam
         self.piv = piv
         self.t = piv.t
+        self.dt = piv.dt
         self.ux0 = np.zeros_like(piv.t); self.uy0 = np.zeros_like(piv.t)
         self.ux1 = np.zeros_like(piv.t); self.uy1 = np.zeros_like(piv.t)
         self.ux2 = np.zeros_like(piv.t); self.uy2 = np.zeros_like(piv.t)
@@ -116,6 +117,11 @@ class RSOI:
         self.u1 = np.cos(theta)*self.ux1 + np.sin(theta)*self.uy1
         self.v1 = -np.sin(theta)*self.ux1 + np.cos(theta)*self.uy1
 
+        # Integrate to r:
+        self.r = np.zeros_like(self.u1)
+        for i in range(0,self.t.shape[0]):
+            self.r[i] = self.r[i-1] + (self.u1[i-1]+self.u1[i])*0.5*self.dt
+
 
         # Find events and compute phase conversion
         self.peakThreshold = setPeakLimits(self.t,self.u1)
@@ -124,26 +130,43 @@ class RSOI:
         print('Or just sieve as a postProcessing step.')
         print('In fact, it will be even better to detect events, then forward that plot, PEAK DOTS INCLUDED, to the peak threshold script!')
         self.ix = findEvents.findEvents2(self.u1, self.t, (np.max(self.t)-self.t[1]+self.t[0]))
+#        self.ix = findEvents.findEvents2(self.r, self.t, (np.max(self.t) - self.t[1]+self.t[0]))
 
         self.ix = self.ix[np.where(self.u1[self.ix] > self.peakThreshold)]
 
         self.theta, self.ixDiff = syncLib2.phaseGen(self.ix,self.t)
 
         # Plot resultant phase plot:
+#        self.plotMeanFuncs('r')
         self.plotMeanFuncs()
 
 
 
     ##############################################################
-    def plotMeanFuncs(self):
-        fig = plt.figure()
-        ax1 = fig.add_subplot(131)
-        line1 = ax1.plot(self.t, self.ux1)
-        ax2 = fig.add_subplot(132)
-        line2 = ax2.plot(self.t, self.uy1)
-        ax3 = fig.add_subplot(133)
-        line3 = ax3.plot(self.t, self.u1)
-        line4 = ax3.plot(self.t[self.ix], self.u1[self.ix], 'ro')
+    def plotMeanFuncs(self,type='u'):
+        if type=='r':
+            fig = plt.figure()
+            ax1 = fig.add_subplot(121)
+            line1 = ax1.plot(self.t, self.r)
+#            ax2 = fig.add_subplot(132)
+#            line2 = ax2.plot(self.t, self.uy1)
+            ax3 = fig.add_subplot(122)
+            line3 = ax3.plot(self.t, self.r)
+            line4 = ax3.plot(self.t[self.ix], self.r[self.ix], 'ro')
+        
+
+
+
+        else:
+            fig = plt.figure()
+            ax1 = fig.add_subplot(131)
+            line1 = ax1.plot(self.t, self.ux1)
+            ax2 = fig.add_subplot(132)
+            line2 = ax2.plot(self.t, self.uy1)
+            ax3 = fig.add_subplot(133)
+            line3 = ax3.plot(self.t, self.u1)
+            line4 = ax3.plot(self.t[self.ix], self.u1[self.ix], 'ro')
+        
         plt.show()
 
     ##############################################################
@@ -179,6 +202,7 @@ class PIV(VelocityField):
         self.ang1=data['ang1']; self.p1=data['p1']; self.ux2=data['ux2']; self.uy2=data['uy2']; self.mag2=data['mag2']
         self.p2=data['p2']; self.ux0=data['ux0']; self.uy0=data['uy0']; self.mag0=data['mag0']; self.side=data['side']
         self.pivN=data['pivN']; self.nFrames=data['nFrames']; self.dt=data['dt']; self.dx=data['dx']
+        #self.dt = self.dt[0]
 
 
 
