@@ -124,6 +124,9 @@ class RSOI:
         print('Or just sieve as a postProcessing step.')
         print('In fact, it will be even better to detect events, then forward that plot, PEAK DOTS INCLUDED, to the peak threshold script!')
         self.ix = findEvents.findEvents2(self.u1, self.t, (np.max(self.t)-self.t[1]+self.t[0]))
+
+        self.ix = self.ix[np.where(self.u1[self.ix] > self.peakThreshold)]
+
         self.theta, self.ixDiff = syncLib2.phaseGen(self.ix,self.t)
 
         # Plot resultant phase plot:
