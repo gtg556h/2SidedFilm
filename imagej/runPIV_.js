@@ -107,7 +107,7 @@ var corr = gd.getNextNumber();
 // imp.getROI();
 
 //var path = IJ.getDirectory("Select a folder to save PIV results");
-path = ["/Users/brian/working/"]
+path = ["/home/brian/ssd/working/"]
 
 
 var stackSize = imp.getImageStackSize();
@@ -141,6 +141,8 @@ for(s=1;s<stackSize;s++){
 	IJ.log("s+1 = " + ss);
     IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+" vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
 
+    // Modify image plus so that it does not ask to save:
+    imp2.changes = false;
     imp2.close();
 
     

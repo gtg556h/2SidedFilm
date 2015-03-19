@@ -62,7 +62,7 @@ class ROI:
 
         self.indices = np.where((piv.x[:,0] < self.x1) & (piv.x[:,0] > self.x0) & (piv.y[:,0] < self.y1) & (piv.y[:,0] > self.y0))[0]
 
-        for i in range(0, piv.t.shape[0]):
+        for i in range(0, piv.t.shape[0]-1):
             self.ux0[i] = np.mean(piv.ux0[self.indices, i])
             self.uy0[i] = np.mean(piv.uy0[self.indices, i])
             self.ux1[i] = np.mean(piv.ux1[self.indices, i])
