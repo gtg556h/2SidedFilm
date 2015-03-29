@@ -1,0 +1,54 @@
+#!/bin/bash
+
+#alias fiji='/home/brian/fiji/20150319/ImageJ-linux64'
+
+width="528"
+height="512"
+
+if [ -e list ]
+then
+   rm list 
+fi
+
+if [ -e list2 ]
+then
+    rm list2
+fi
+
+
+find . -name "header" -exec dirname {} >> list \;
+
+sed 's/.\///' list >> list2
+
+
+
+while read -r line
+do
+    name=$line
+
+    echo -n "hello there " > script_.js
+    echo $line >> script_.js
+    echo "content on new line..." >> script_.js
+    echo $name
+
+    sed -n 1,5p ~/git/cardiac/imagej/importAndorTemplate.js > script_.js
+    echo "stem = \"$line\";" >> script_.js
+    echo "width = \"$width\";" >> script_.js
+    echo "height = \"$height\";" >> script_.js
+
+    sed -n 9,31p ~/git/cardiac/imagej/importAndorTemplate.js >> script_.js
+
+    rm "$line/header"
+    
+    /home/brian/fiji/20150319/ImageJ-linux64 script_.js
+    rm list
+    rm list2
+    
+    
+done < list2
+
+
+
+
+
+
