@@ -41,11 +41,12 @@ do
     rm "$line/header"
     
     /home/brian/fiji/20150319/ImageJ-linux64 script_.js
-    rm list
-    rm list2
-    
+
     
 done < list2
+
+rm list
+rm list2
 
 
 
