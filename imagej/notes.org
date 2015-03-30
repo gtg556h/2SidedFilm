@@ -1,0 +1,4 @@
+* Currently working on automating PIV output
+* My (almost) functional script is processPIVTemplate.js
+* Unfortunately, it is writing the SAME output filename everytime.
+* Need to fix and incorporate as template!!!x
