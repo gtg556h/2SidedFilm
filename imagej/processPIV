@@ -4,6 +4,14 @@
 
 width="528"
 height="512"
+piv1="64"
+sw1="128"
+vs1="32"
+piv2="32"
+sw2="64"
+vs2="16"
+piv3="0"
+correlation="0.8"
 
 if [ -e list ]
 then
@@ -22,15 +30,44 @@ sed 's/.\///' list >> list2
 
 while read -r line
 do
-    name=$line"_bgs.tiff"
+    #name=$line"_bgs.tiff"
+    name=$line
     echo $name
-    if [ -e $name ]
+    if [ -e $name"_bgs.tif" ]
     then
         echo "$name already processed"
-    else
+    
+    elif [ -e $name".tif" ]
+    then 
         echo "Processing $name"
+        sed -n 1,20p ~/git/cardiac/imagej/processPIVTemplate.js > script_.js
+        mkdir $name"_PIV"
+        echo "path = \""`pwd`"/"$name"_PIV/\";" >> script_.js
+        echo "imp = IJ.openImage(\""`pwd`"/"$name".tif\");" >> script_.js
+        sed -n 26,30p ~/git/cardiac/imagej/processPIVTemplate.js >> script_.js
+        echo "IJ.saveAs(\"Tiff\", \""`pwd`"/"$name"_bgs.tif\");" >> script_.js
+        sed -n 32,61p ~/git/cardiac/imagej/processPIVTemplate.js >> script_.js
+
+        echo "IJ.run(\"iterative PIV(Advanced)...\", \" piv1="$piv1" sw1="$sw1" vs1="$vs1" piv2="$piv2" sw2="$sw2" vs2="$vs2" piv3="$piv3" correlation="$correlation" batch path=["`pwd`"/"$name"_PIV/]\");" >> script_.js
+        sed -n 64,72p ~/git/cardiac/imagej/processPIVTemplate.js >> script_.js
+
+        /home/brian/fiji/20150319/ImageJ-linux64 script_.js
+
+        echo " doing things "   
+
+    else
+        echo "Convert raw data first!!!"
+
     fi
 done < list2
+
+rm list
+rm list2
+if [ -e script_.js ]
+then
+   rm script_.js
+fi
+
 
 
 

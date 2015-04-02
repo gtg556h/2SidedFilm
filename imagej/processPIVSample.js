@@ -51,14 +51,13 @@ for(s=1;s<stackSize;s++){
     ip2.insert(stack.getProcessor(ss),0,0);
     stack2.addSlice(null, ip2);
 
-    imp2 = ImagePlus("seq_"+s+"_0", stack2);
+    imp2 = ImagePlus("current", stack2);
     imp2.show();
 
     IJ.log("s = " + s);
     
     //IJ.run("iterative PIV(Advanced)...", " piv1="+piv1+" sw1="+sw1+" vs1="+vs1+" piv2="+piv2+" sw2="+sw2+"   vs2="+vs2+" piv3="+piv3+" sw3="+sw3+" vs3="+vs3+" correlation="+corr+" batch path=["+path+"]");
 
-    WindowManager.setTempCurrentImage(imp2);
     IJ.run("iterative PIV(Advanced)...", " piv1=64 sw1=128 vs1=32 piv2=32 sw2=64 vs2=16 piv3=0 correlation=0.8 batch path=[/home/brian/working/pivOutput/]");
 
 
