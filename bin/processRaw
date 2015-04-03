@@ -31,12 +31,12 @@ do
     echo "content on new line..." >> script_.js
     echo $name
 
-    sed -n 1,5p ~/git/cardiac/imagej/processRawTemplate.js > script_.js
+    sed -n 1,5p ~/git/cardiac/bin/processRawTemplate.js > script_.js
     echo "stem = \"$line\";" >> script_.js
     echo "width = \"$width\";" >> script_.js
     echo "height = \"$height\";" >> script_.js
 
-    sed -n 9,31p ~/git/cardiac/imagej/processRawTemplate.js >> script_.js
+    sed -n 9,31p ~/git/cardiac/bin/processRawTemplate.js >> script_.js
 
     rm "$line/header"
     

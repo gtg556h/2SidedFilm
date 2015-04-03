@@ -1,0 +1,18 @@
+* 20150403 status:
+** raw PIV data now in /dat
+** Restructured scripts so all processing automation code is in cardiac/bin
+** Wrote Python scripts
+** Need to test and debug!!!
+
+* Status:
+** Everything works!
+** Now, instead of writing PIV to PIV directory, write it to "<filename>_PIV/dat"
+** Then, gen python scripts to make npz arrays, saved in "<filename>_PIV"
+** Then, remove all unnecessary imagej generated images!
+
+
+
+* Currently working on automating PIV output
+* My (almost) functional script is processPIVTemplate.js
+* Unfortunately, it is writing the SAME output filename everytime.
+* Need to fix and incorporate as template!!!x
