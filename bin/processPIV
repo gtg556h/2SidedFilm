@@ -44,7 +44,7 @@ do
     then
         echo "$name already processed"
     
-    elif [ -e $name".tif" ]
+    elif [ -e $name".tif" ] 
     then 
         echo "Processing $name"
         sed -n 1,20p ~/git/cardiac/bin/processPIVTemplate.js > script_.js
@@ -55,13 +55,13 @@ do
         echo "IJ.saveAs(\"Tiff\", \""`pwd`"/"$name"_bgs.tif\");" >> script_.js
         sed -n 32,61p ~/git/cardiac/bin/processPIVTemplate.js >> script_.js
 
-        echo "IJ.run(\"iterative PIV(Advanced)...\", \" piv1="$piv1" sw1="$sw1" vs1="$vs1" piv2="$piv2" sw2="$sw2" vs2="$vs2" piv3="$piv3" correlation="$correlation" batch path=["`pwd`"/"$name"_PIV/]\");" >> script_.js
+        echo "IJ.run(\"iterative PIV(Advanced)...\", \" piv1="$piv1" sw1="$sw1" vs1="$vs1" piv2="$piv2" sw2="$sw2" vs2="$vs2" piv3="$piv3" correlation="$correlation" batch path=["`pwd`"/"$name"_PIV/dat/]\");" >> script_.js
         sed -n 64,72p ~/git/cardiac/bin/processPIVTemplate.js >> script_.js
 
         /home/brian/fiji/20150319/ImageJ-linux64 script_.js
                             
         echo "Importing $name into Python... "
-        python3 /home/brian/git/cardiac/bin/pivPostProcess.py `pwd`"/"$name"_PIV/dat/" $name"_bgsPIV" $side $pivN $nFrames $dt $dx
+        python3 /home/brian/git/cardiac/bin/pivPostProcess.py `pwd`"/"$name"_PIV/dat/" $name"_PIV/"$name"_bgsPIV" $side $pivN $nFrames $dt $dx
 
     else
         echo "Convert raw data first!!!"
@@ -69,8 +69,8 @@ do
     fi
 done < list2
 
-rm list
-rm list2
+#rm list
+#rm list2
 if [ -e script_.js ]
 then
    rm script_.js

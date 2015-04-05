@@ -19,7 +19,7 @@ dx = float(sys.argv[7])
 #dx = 0.650 # microns/pixel
 #baseDirectory = "/Users/brian/working/1sFilmPIV/"  
 
-outFilename = "trial"
+#outFilename = "trial"
 
 
 
