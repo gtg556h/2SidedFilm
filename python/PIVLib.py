@@ -7,6 +7,7 @@ import matplotlib.patches as patches
 import pdb
 import findEvents
 import syncLib2
+import pickle
 #from pivVisualization import VelocityField
 from pivVisualizationLib import plotFlip,RectangleBuilder2,VelocityField,setPeakLimits
 
@@ -288,5 +289,13 @@ class RegionSet:
         plt.show()
         
 
+
         
+def loadPickle(filename):
+    with open(filename, 'rb') as input:
+        p1 = pickle.load(input)
+        set1 = pickle.load(input)
+        set2 = pickle.load(input)
+        dtheta = pickle.load(input)
+        t = pickle.load(input)
 

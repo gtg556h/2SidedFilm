@@ -1,0 +1,11 @@
+import PIVLib
+#import pickle
+
+#with open('analysis.pkl', 'rb') as input:
+#    p1 = pickle.load(input)
+#    set1 = pickle.load(input)
+#    set2 = pickle.load(input)
+#    dtheta = pickle.load(input)
+#    t = pickle.load(input)
+
+PIVLib.importPickle(filename)
