@@ -1,0 +1,9 @@
+#!/bin/bash
+
+# Script to view interesting data:
+
+# A blank file named "good" is my flag for interesting data
+# find ./ -name "good"
+# then:
+# display path/*.eps
+
